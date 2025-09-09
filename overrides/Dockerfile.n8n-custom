@@ -1,3 +1,3 @@
 FROM n8nio/n8n:stable
-RUN npm explore n8n -- npm i --omit=dev yahoo-finance2@2.13.0 && npm cache clean --force
+RUN npm explore -g n8n -- npm i --omit=dev yahoo-finance2 && npm cache clean --force
 USER node
