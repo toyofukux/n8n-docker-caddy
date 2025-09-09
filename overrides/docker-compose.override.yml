@@ -1,0 +1,11 @@
+services:
+  n8n:
+    build:
+      context: ./overrides
+      dockerfile: Dockerfile.n8n-custom
+    environment:
+      - N8N_ENABLE_EXTERNAL_MODULES=true
+      - NODE_FUNCTION_ALLOW_EXTERNAL=yahoo-finance2
+  caddy:
+    volumes:
+      - ./overrides/Caddyfile.local:/etc/caddy/Caddyfile:ro
