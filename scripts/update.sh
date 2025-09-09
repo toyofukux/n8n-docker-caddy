@@ -11,7 +11,6 @@ die() { printf "\033[1;31m[error]\033[0m %s\n" "$*" >&2; exit 1; }
 
 need_file() { [[ -f "$1" ]] || die "missing file: $1"; }
 load_env()   { set -a; . "$ENVFILE"; set +a; }
-check_envs() { for v in N8N_HOST WEBHOOK_URL DB_PASSWORD; do [[ -n "${!v:-}" ]] || die "missing env: $v"; done; }
 
 ensure_volumes() {
   for v in caddy_data caddy_config n8n_data; do
@@ -35,7 +34,6 @@ main() {
   need_file "$ENVFILE"
   need_file "overrides/Caddyfile.local"
   load_env
-  check_envs
   ensure_volumes
   git_update
   redeploy
