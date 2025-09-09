@@ -4,7 +4,7 @@ services:
       context: ./overrides
       dockerfile: Dockerfile.n8n-custom
       args:
-        N8N_TAG: ${N8N_TAG}
+        N8N_TAG: ${N8N_TAG:-1.111.0}
     environment:
       - N8N_ENABLE_EXTERNAL_MODULES=true
       - NODE_FUNCTION_ALLOW_EXTERNAL=yahoo-finance2
