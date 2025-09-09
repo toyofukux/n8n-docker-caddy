@@ -28,7 +28,9 @@ redeploy() {
   log "compose build --pull n8n"
   docker compose "${COMPOSE_FILES[@]}" build --pull n8n
   log "compose up n8n (no-deps, build)"
-  docker compose "${COMPOSE_FILES[@]}" up -d --no-deps --build n8n
+  docker compose "${COMPOSE_FILES[@]}" up -d --no-deps n8n
+  log "compose up caddy"
+  docker compose "${COMPOSE_FILES[@]}" up -d caddy
   log "done ✅"
 }
 
