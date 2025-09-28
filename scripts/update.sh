@@ -3,7 +3,6 @@ set -euo pipefail
 
 ENVFILE=${ENVFILE:-.env}
 BRANCH=${BRANCH:-custom/main}
-UP=${UP:-upstream}
 
 log() { printf "\033[1;34m[update]\033[0m %s\n" "$*"; }
 die() { printf "\033[1;31m[error]\033[0m %s\n" "$*" >&2; exit 1; }
@@ -15,12 +14,6 @@ ensure_volumes() {
   for v in caddy_data caddy_config n8n_data; do
     docker volume inspect "$v" >/dev/null 2>&1 || { log "create volume $v"; docker volume create "$v" >/dev/null; }
   done
-}
-
-git_update() {
-  log "fetch $UP --tags";   git fetch "$UP" --tags
-  log "checkout $BRANCH";   git checkout "$BRANCH"
-  log "rebase $UP/main";    git rebase "$UP/main" --autostash
 }
 
 redeploy() {
@@ -63,7 +56,6 @@ main() {
   need_file "overrides/Caddyfile.local"
   load_env
   ensure_volumes
-  git_update
   redeploy
 }
 main "$@"
