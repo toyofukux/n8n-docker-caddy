@@ -15,15 +15,6 @@ services:
   notion-mcp:
     image: mcp/notion:latest
     restart: unless-stopped
-    command:
-      [
-        "npx",
-        "@notionhq/notion-mcp-server",
-        "--transport",
-        "http",
-        "--port",
-        "3000",
-      ]
     environment:
       # Notion integration token
       - NOTION_TOKEN=${NOTION_TOKEN}
@@ -32,7 +23,4 @@ services:
     expose:
       - "3000"
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/mcp/healthz"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
+      test: ["CMD","wget","-qO-","http://localhost:3000/health"]
