@@ -2,3 +2,5 @@
 .env.*
 !.env.example
 overrides/Caddyfile.local
+overrides/Dockerfile.n8n-custom
+overrides/docker-compose.override.yml

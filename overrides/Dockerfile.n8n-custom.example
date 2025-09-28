@@ -1,0 +1,5 @@
+ARG N8N_TAG=1.111.0
+FROM docker.n8n.io/n8nio/n8n:${N8N_TAG}
+USER root
+RUN npm explore -g n8n -- npm i --omit=dev yahoo-finance2 && npm cache clean --force
+USER node
