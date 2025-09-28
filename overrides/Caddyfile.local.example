@@ -3,4 +3,16 @@ n8n.<domain>.<suffix> {
     reverse_proxy n8n:5678 {
       flush_interval -1
     }
+
+    @mcp path /mcp/notion*
+    handle @mcp {
+        reverse_proxy notion-mcp:3000 {
+            header_up Authorization {>Authorization}
+            flush_interval 100ms
+            transport http {
+                read_idle_timeout 0
+                write_timeout 0
+            }
+        }
+    }
 }
