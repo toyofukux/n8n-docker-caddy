@@ -11,3 +11,28 @@ services:
   caddy:
     volumes:
       - ./overrides/Caddyfile.local:/etc/caddy/Caddyfile:ro
+
+  notion-mcp:
+    image: mcp/notion:latest
+    restart: unless-stopped
+    command:
+      [
+        "npx",
+        "@notionhq/notion-mcp-server",
+        "--transport",
+        "http",
+        "--port",
+        "3000",
+      ]
+    environment:
+      # Notion integration token
+      - NOTION_TOKEN=${NOTION_TOKEN}
+      # from n8n to notion-mcp token
+      - AUTH_TOKEN=${N8N_NOTION_AUTH_TOKEN}
+    expose:
+      - "3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/mcp/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
