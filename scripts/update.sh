@@ -4,7 +4,6 @@ set -euo pipefail
 ENVFILE=${ENVFILE:-.env}
 BRANCH=${BRANCH:-custom/main}
 UP=${UP:-upstream}
-COMPOSE_FILES=(-f docker-compose.yml -f overrides/docker-compose.override.yml)
 
 log() { printf "\033[1;34m[update]\033[0m %s\n" "$*"; }
 die() { printf "\033[1;31m[error]\033[0m %s\n" "$*" >&2; exit 1; }
@@ -25,14 +24,39 @@ git_update() {
 }
 
 redeploy() {
-  log "compose build --pull n8n"
-  docker compose "${COMPOSE_FILES[@]}" build --pull n8n
-  log "compose up n8n (no-deps, build)"
-  docker compose "${COMPOSE_FILES[@]}" up -d --no-deps n8n
-  log "compose up caddy"
-  docker compose "${COMPOSE_FILES[@]}" up -d caddy
-  log "done ✅"
+  set -euo pipefail
+
+  local FAST_MODE=0
+  if [[ "${1:-}" == "--fast" ]]; then
+    FAST_MODE=1
+    shift
+  fi
+
+  # search
+  local files=("docker-compose.yml")
+  while IFS= read -r -d '' f; do files+=("$f"); done < <(
+    find overrides -type f -name 'docker-compose*.yml' -print0 2>/dev/null | sort -z
+  )
+
+  local args=()
+  for f in "${files[@]}"; do
+    [[ -f "$f" ]] && args+=("-f" "$f")
+  done
+
+  echo "[redeploy] using compose files:"
+  printf '  - %s\n' "${files[@]}"
+
+  if [[ "$FAST_MODE" -eq 1 ]]; then
+    echo "[redeploy] 🚀 Fast mode (no build, no pull)"
+    docker compose "${args[@]}" up -d --no-build
+  else
+    echo "[redeploy] 🔨 Full mode (pull, build, remove orphans)"
+    docker compose "${args[@]}" pull --ignore-pull-failures || true
+    docker compose "${args[@]}" build --pull --parallel
+    docker compose "${args[@]}" up -d --remove-orphans
+  fi
 }
+
 
 main() {
   need_file "$ENVFILE"
