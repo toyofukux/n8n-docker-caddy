@@ -30,6 +30,12 @@ redeploy() {
   fi
 
   docker compose "${FILES[@]}" ps
+
+  log "prune dangling images"
+  docker image prune -f >/dev/null 2>&1 || true
+
+  log "prune build cache"
+  docker builder prune -f >/dev/null 2>&1 || true
 }
 
 main() {
