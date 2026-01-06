@@ -1,5 +1,8 @@
-ARG N8N_TAG=1.111.0
+ARG N8N_TAG
 FROM docker.n8n.io/n8nio/n8n:${N8N_TAG}
+# Copy apk and its deps from Alpine 3.23
+COPY --from=alpine:3.23 /sbin/apk /sbin/apk
+COPY --from=alpine:3.23 /usr/lib/libapk.so* /usr/lib/
 USER root
 RUN npm explore -g n8n -- npm i --omit=dev yahoo-finance2 && npm cache clean --force
 USER node
